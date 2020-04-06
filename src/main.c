@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "token.h"
 #include "shell.h"
 
@@ -44,15 +45,12 @@ char *promptalloc(int status) {
     /* Try to make the exit code part of the prompt, if it's not zero */
     if (status) {
         char exit_code_str[8];
-        sprintf(exit_code_str, "%d", status);
+        sprintf(exit_code_str, "[%d]", status);
         if (!strlen(exit_code_str)) {
             fprintf(stderr, "prompt exit code parsing error\n");
             exit(EXIT_FAILURE);
         }
-
-        strcat(prompt, "[");
         strcat(prompt, exit_code_str);
-        strcat(prompt, "]");
     }
 
     strcat(prompt, "> ");

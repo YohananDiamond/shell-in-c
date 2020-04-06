@@ -1,33 +1,38 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <string.h>
 #include "token.h"
 
 #include "shell.h"
+
+int run_command(char **args);
+int builtin_exit(int argv, char **args);
+int builtin_cd(int argv, char **args);
+int builtin_pwd(int argv, char **args);
 
 int run_command(char **args) {
     int argv = tokens_len(args);
 
     if (argv == 0) {
         return 0;
-    }
-    else if (!strcmp(args[0], "exit")) {
+    } else if (!strcmp(args[0], "exit")) {
         return builtin_exit(argv, args);
     }
     else if (!strcmp(args[0], "cd")) {
         return builtin_cd(argv, args);
-    }
-    else {
+    } else if (!strcmp(args[0], "pwd")) {
+        return builtin_pwd(argv, args);
+    } else {
         printf("unknown command: %s\n", args[0]);
-        return EXIT_FAILURE;
+        return 127;
     }
 }
 
 int builtin_exit(int argv, char **args) {
-    if (argv == 0)
-        exit(EXIT_SUCCESS);
-
     if (argv == 1) {
+        exit(EXIT_SUCCESS);
+    } else if (argv == 2) {
         int code = (int)strtol(args[1], NULL, 10);
         exit(code);
     } else {
@@ -37,17 +42,31 @@ int builtin_exit(int argv, char **args) {
 }
 
 int builtin_cd(int argv, char **args) {
-    if (argv == 0) {
+    if (argv == 1) {
         chdir(getenv("HOME"));
         return EXIT_SUCCESS; /* Not sure on how to do error handling on this yet */
-    }
-
-    if (argv == 1) {
+    } else if (argv == 2) {
         chdir(args[1]);
         return EXIT_SUCCESS;
     } else {
-        printf("cd: invalid amount of arguments");
+        printf("cd: invalid amount of arguments\n");
         return EXIT_FAILURE;
+    }
+}
+
+int builtin_pwd(int argv, char **args) {
+    if (argv == 1) {
+        char cwd[256];
+        if (getcwd(cwd, sizeof(cwd)) != NULL) {
+            printf("%s\n", cwd);
+            return 0;
+        } else {
+            printf("pwd: could not get current working dir\n");
+            return 1;
+        }
+    } else {
+        printf("pwd: too many arguments\n");
+        return 0;
     }
 }
 
