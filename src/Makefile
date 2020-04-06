@@ -5,8 +5,10 @@ LIBS :=
 CC := gcc
 CFLAGS := -I$(IDIR)
 
-_DEPS := sample.h
-_OBJ := main.o sample.o
+_FILES := token shell
+
+_DEPS := $(patsubst %,%.h,$(_FILES))
+_OBJ := main.o $(patsubst %,%.o,$(_FILES))
 
 DEPS := $(patsubst %,$(IDIR)/%,$(_DEPS))
 OBJ := $(patsubst %,$(ODIR)/%,$(_OBJ))
@@ -24,7 +26,8 @@ $(ODIR)/%.o: %.c $(DEPS)
 all: clean shell
 
 clean:
-	if [ -r $(ODIR) ]; then rm -r $(ODIR)/*; else mkdir $(ODIR); fi
+	if [ -r $(ODIR) ]; then rm -r $(ODIR); fi
+	mkdir $(ODIR)
 
 shell: $(OBJ)
 	$(CC) -o $(ODIR)/$@ $^ $(CFLAGS) $(LIBS)
