@@ -1,2 +1,2 @@
-int run_command(char **args);
-int execute_command(char **args);
+int run_args(char **args);
+int fork_and_execute(char **args);

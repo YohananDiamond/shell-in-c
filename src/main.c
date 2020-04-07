@@ -22,14 +22,14 @@ int main() {
 
         input = get_input();
         tokens = tokenize_input(input);
-        status = run_command(tokens);
+        status = run_args(tokens);
 
         free(input);
         free(tokens);
         free(prompt);
     }
 
-    return EXIT_SUCCESS;
+    return 1;
 }
 
 char *promptalloc(int status) {

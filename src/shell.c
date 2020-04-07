@@ -2,16 +2,16 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include <sys/wait.h>
 #include "token.h"
 
 #include "shell.h"
 
-int run_command(char **args);
 int builtin_exit(int argv, char **args);
 int builtin_cd(int argv, char **args);
 int builtin_pwd(int argv, char **args);
 
-int run_command(char **args) {
+int run_args(char **args) {
     int argv = tokens_len(args);
 
     if (argv == 0) {
@@ -24,8 +24,7 @@ int run_command(char **args) {
     } else if (!strcmp(args[0], "pwd")) {
         return builtin_pwd(argv, args);
     } else {
-        printf("unknown command: %s\n", args[0]);
-        return 127;
+        return fork_and_execute(args);
     }
 }
 
@@ -70,25 +69,26 @@ int builtin_pwd(int argv, char **args) {
     }
 }
 
-/* int execute_command(char **args) { */
-/*     pid_t pid, wpid; */
-/*     int status; */
+int fork_and_execute(char **args) {
+    /* Pretty much copied this one from the tutorial :P */
+    pid_t pid, wpid;
+    int status;
 
-/*     pid = fork(); */
-/*     if (pid == 0) { */
-/*         /1* The process is a child process *1/ */
-/*         if (execvp(args[0], args) == -1) */
-/*             perror("shell"); */
-/*         exit(EXIT_FAILURE); */
-/*     } else if (pid < 0) { */
-/*         /1* The forking failed *1/ */
-/*         perror("shell"); */
-/*     } else { */
-/*         /1* The process is a parent process *1/ */
-/*         do { */
-/*             wpid = waitpid(pid, &status, WUNTRACED); */
-/*         } while (!WIFEXITED(status) && !WIFSIGNALED(status)); */
-/*     } */
+    pid = fork();
+    if (pid == 0) {
+        /* The process is a child process */
+        if (execvp(args[0], args) == -1)
+            perror("shell");
+        exit(EXIT_FAILURE);
+    } else if (pid < 0) {
+        /* The forking failed */
+        perror("shell");
+    } else {
+        /* The process is a parent process */
+        do {
+            wpid = waitpid(pid, &status, WUNTRACED);
+        } while (!WIFEXITED(status) && !WIFSIGNALED(status));
+    }
 
-/*     return 1; */
-/* } */
+    return 1;
+}

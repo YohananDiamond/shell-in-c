@@ -72,7 +72,7 @@ char **tokenize_input(char *input) {
         }
 
         /* Null here means that strtok will keep tokenizing the string
-           specified before. Quite tricky but interesting. */
+         * specified before. Quite tricky but interesting. */
         token = strtok(NULL, PARSE_ARGS_TOK_DELIM);
     }
 
