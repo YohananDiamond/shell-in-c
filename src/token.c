@@ -21,6 +21,7 @@ char *get_input() {
         c = getchar();
 
         if (c == EOF || c == '\n') {
+            /* FIXME: pressing ^D on an empty line causes an infinite loop. Don't know why. */
             buffer[position] = '\0';
             return buffer;
         } else {

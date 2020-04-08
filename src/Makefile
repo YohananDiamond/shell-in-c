@@ -34,5 +34,3 @@ shell: $(OBJ)
 
 run: all
 	$(ODIR)/shell
-
-# TODO: shell is incomplete and wrong
