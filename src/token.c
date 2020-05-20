@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "token.h"
+#include "main.h"
 
 char *get_input() {
     int bufsize = GET_INPUT_BUFSIZE;

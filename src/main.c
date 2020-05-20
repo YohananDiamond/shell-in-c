@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "token.h"
-#include "shell.h"
+
+#include "main.h"
 
 #define PROMPT_STRING_BUFSIZE 64
 

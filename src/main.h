@@ -1,3 +1,6 @@
+int run_args(char **args);
+int fork_and_execute(char **args);
+
 char *get_input();
 char **tokenize_input(char *input);
 int tokens_len(char **tokens);

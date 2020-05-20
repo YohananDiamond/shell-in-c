@@ -3,9 +3,8 @@
 #include <unistd.h>
 #include <string.h>
 #include <sys/wait.h>
-#include "token.h"
 
-#include "shell.h"
+#include "main.h"
 
 int builtin_exit(int argv, char **args);
 int builtin_cd(int argv, char **args);
