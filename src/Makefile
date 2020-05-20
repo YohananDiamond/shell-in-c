@@ -1,36 +1,27 @@
-IDIR := .
-ODIR := build
+CC := gcc
 LIBS :=
 
-CC := gcc
-CFLAGS := -I$(IDIR)
+NAME := shell
+FILES := main shell token
+TARGET := ../target
 
-_FILES := token shell
+_SOURCE_FILES := $(patsubst %,%.c,$(FILES))
+_OUTPUT_FILES := $(patsubst %,%.o,$(FILES))
+_LIB_FLAGS := $(patsubst %,-l%,$(LIBS))
+CFLAGS := $(_LIB_FLAGS)
 
-_DEPS := $(patsubst %,%.h,$(_FILES))
-_OBJ := main.o $(patsubst %,%.o,$(_FILES))
+all: compile assemble
 
-DEPS := $(patsubst %,$(IDIR)/%,$(_DEPS))
-OBJ := $(patsubst %,$(ODIR)/%,$(_OBJ))
+compile:
+	[ -d $(TARGET) ] || mkdir -p $(TARGET)
+	$(CC) -c $(_SOURCE_FILES)
+	mv *.o -t $(TARGET)
 
-.PHONY: all clean run
-
-# Some symbols ->>
-# $@: left side of :
-# $<: first dependency (what does that mean? the first arg of $(DEPS)?)
-# $^: right side of :
-
-$(ODIR)/%.o: %.c $(DEPS)
-	$(CC) -c -o $@ $< $(CFLAGS)
-
-all: clean shell
-
-clean:
-	if [ -r $(ODIR) ]; then rm -r $(ODIR); fi
-	mkdir $(ODIR)
-
-shell: $(OBJ)
-	$(CC) -o $(ODIR)/$@ $^ $(CFLAGS) $(LIBS)
+assemble:
+	$(CC) $(CFLAGS) -o $(TARGET)/$(NAME) $(patsubst %,$(TARGET)/%,$(_OUTPUT_FILES))
 
 run: all
-	$(ODIR)/shell
+	./$(TARGET)/$(NAME)
+
+clean:
+	rm $(TARGET)/*.o $(TARGET)/$(NAME)
