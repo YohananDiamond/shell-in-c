@@ -2,7 +2,7 @@ CC := gcc
 LIBS :=
 
 NAME := shell
-FILES := main shell token
+FILES := main builtins tokenizer processer
 TARGET := ../target
 
 _SOURCE_FILES := $(patsubst %,%.c,$(FILES))

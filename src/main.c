@@ -4,56 +4,64 @@
 
 #include "main.h"
 
-#define PROMPT_STRING_BUFSIZE 64
+int main(int argv, char** args) {
+	int last_code = 0; /* last program's exit code */
+	char *prompt;
 
-int main(void);
-char *promptalloc(int status);
+	if (argv != 1)
+		printf("%s: warning: argument parsing is not a feature yet\n", args[0]);
 
-int main() {
-    int status = 0;
-    char *prompt;
+	for (;;) {
+		char *input;
+		char **tokens;
 
-    for (;;) {
-        char *input;
-        char **tokens;
+		/* make and print prompt */
+		prompt = prompt_alloc(last_code);
+		printf("%s", prompt);
 
-        prompt = promptalloc(status);
-        printf(prompt);
+		/* get input */
+		input = tokenizer_read_line();
+		if (!input) {
+			printf("%s: could not read line", args[0]);
+			return EXIT_FAILURE;
+		}
 
-        input = get_input();
-        tokens = tokenize_input(input);
-        status = run_args(tokens);
+		/* parse input */
+		tokens = tokenizer_parse_str(input);
+		if (!tokens) {
+			printf("%s: could not parse line", args[0]);
+			return EXIT_FAILURE;
+		}
 
-        free(input);
-        free(tokens);
-        free(prompt);
-    }
+		/* get amount of tokens */
+		int command_argv = tokenizer_token_array_len(tokens);
+		last_code = processer_process_args(args[0], command_argv, tokens);
 
-    return 1;
+		/* free some things */
+		free(prompt);
+		free(tokens);
+		free(input);
+	}
 }
 
-char *promptalloc(int status) {
-    char *prompt;
+char *prompt_alloc(int last_code) {
+	char *prompt;
 
-    /* Allocate space for the prompt */
-    prompt = malloc(sizeof(char) * PROMPT_STRING_BUFSIZE);
-    if (!prompt) {
-        fprintf(stderr, "prompt allocation error\n");
-        exit(EXIT_FAILURE);
-    }
+	/* alloc space for prompt, return NULL if failed */
+	prompt = malloc((sizeof *prompt) * PROMPT_STRING_BUFSIZE);
+	if (!prompt)
+		return NULL;
 
-    /* Try to make the exit code part of the prompt, if it's not zero */
-    if (status) {
-        char exit_code_str[8];
-        sprintf(exit_code_str, "[%d]", status);
-        if (!strlen(exit_code_str)) {
-            fprintf(stderr, "prompt exit code parsing error\n");
-            exit(EXIT_FAILURE);
-        }
-        strcat(prompt, exit_code_str);
-    }
-
-    strcat(prompt, "> ");
-
-    return prompt;
+	/* if not zero, put the exit code part of the prompt */
+	if (last_code != 0) {
+		/* this part seems very flawled. Might take a look at the stdlib and see what string commands use malloc. */
+		char str[8];
+		sprintf(str, "[%d]", last_code);
+		if (strlen(str) == 0)
+			return NULL;
+		strcat(prompt, str);
+	}
+	
+	strcat(prompt, "> ");
+	return prompt;
 }
