@@ -20,10 +20,12 @@ char *tokenizer_read_line() {
 		}
 
 		int c = getchar();
-		if (c == EOF || c == '\n') {
-			/* FIXME: ^D weird thing */
+		if (c == '\n') {
 			buffer[pos] = '\0';
 			return buffer;
+		} else if (c == EOF) {
+			/* STDIN is closed */
+			return NULL;
 		} else {
 			buffer[pos] = c;
 		}

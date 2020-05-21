@@ -22,14 +22,14 @@ int main(int argv, char** args) {
 		/* get input */
 		input = tokenizer_read_line();
 		if (!input) {
-			printf("%s: could not read line", args[0]);
+			printf("%s: could not read line\n", args[0]);
 			return EXIT_FAILURE;
 		}
 
 		/* parse input */
 		tokens = tokenizer_parse_str(input);
 		if (!tokens) {
-			printf("%s: could not parse line", args[0]);
+			printf("%s: could not parse line\n", args[0]);
 			return EXIT_FAILURE;
 		}
 
